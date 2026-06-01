@@ -866,6 +866,9 @@
       <div class="answers-grid" id="boss-answers-grid"></div>
     </div>
     <div class="explanation-box" id="boss-explanation-box"></div>
+    <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+      <button class="btn-next-level" id="btn-boss-continue" onclick="showReward()" style="display:none;">Am înțeles, continuă →</button>
+    </div>
   </div>
 
   <!-- REWARD SCREEN -->
@@ -1702,7 +1705,7 @@ function retryLevel() {
 function startBoss() {
   state.phase = 'boss';
   state.bossAnswered = false;
-  state.bossTimeLeft = 30;
+  state.bossTimeLeft = 45;
 
   const level = LEVELS[state.currentLevel];
   const boss = level.bossQuestion;
@@ -1740,14 +1743,16 @@ function startBoss() {
 function startBossTimer() {
   const bar = document.getElementById('timer-bar');
   const display = document.getElementById('timer-display');
-  state.bossTimeLeft = 30;
+  state.bossTimeLeft = 45;
 
   if (state.bossTimer) clearInterval(state.bossTimer);
 
+  const startTime = Date.now();
   state.bossTimer = setInterval(() => {
-    state.bossTimeLeft--;
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    state.bossTimeLeft = Math.max(0, 45 - elapsed);
     display.textContent = state.bossTimeLeft;
-    bar.style.width = (state.bossTimeLeft / 30 * 100) + '%';
+    bar.style.width = (state.bossTimeLeft / 45 * 100) + '%';
 
     if (state.bossTimeLeft <= 0) {
       clearInterval(state.bossTimer);
@@ -1755,7 +1760,7 @@ function startBossTimer() {
         timeoutBoss();
       }
     }
-  }, 1000);
+  }, 500);
 }
 
 function timeoutBoss() {
@@ -1768,9 +1773,7 @@ function timeoutBoss() {
   expBox.textContent = '⏱️ Timp expirat! ' + level.bossQuestion.explanation;
   expBox.className = 'explanation-box show wrong-exp';
   loseLife();
-  setTimeout(() => {
-    if (state.lives > 0) showReward();
-  }, 2000);
+  document.getElementById('btn-boss-continue').style.display = 'block';
 }
 
 function answerBoss(idx, btn) {
@@ -1786,17 +1789,17 @@ function answerBoss(idx, btn) {
   const expBox = document.getElementById('boss-explanation-box');
   expBox.textContent = boss.explanation;
 
+  document.getElementById('btn-boss-continue').style.display = 'block';
+
   if (idx === boss.correct) {
     btn.classList.add('correct');
     expBox.className = 'explanation-box show';
     state.score += 20;
-    setTimeout(() => showReward(), 1800);
   } else {
     btn.classList.add('wrong');
     allBtns[boss.correct].classList.add('reveal-correct');
     expBox.className = 'explanation-box show wrong-exp';
     loseLife();
-    if (state.lives > 0) setTimeout(() => showReward(), 2000);
   }
 }
 
