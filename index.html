@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frate, eu cum fac bani pe bursă?</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e17;
+    --card: #1a1a2e;
+    --card2: #16213e;
+    --gold: #f4a261;
+    --gold2: #e76f51;
+    --teal: #2ec4b6;
+    --danger: #e63946;
+    --success: #2ec4b6;
+    --text: #fffffe;
+    --muted: #a7a9be;
+    --purple: #7b2d8b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+  }
+
+  #app {
+    width: 100%;
+    max-width: 800px;
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===== SCREEN MANAGEMENT ===== */
+  .screen { display: none; flex-direction: column; flex: 1; }
+  .screen.active { display: flex; }
+
+  /* ===== START SCREEN ===== */
+  #screen-start {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 24px;
+    padding: 40px 20px;
+  }
+
+  .game-logo {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(22px, 5vw, 38px);
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1.2;
+    text-shadow: 0 0 40px rgba(244,162,97,0.4);
+    animation: glow 3s ease-in-out infinite;
+  }
+
+  @keyframes glow {
+    0%, 100% { text-shadow: 0 0 20px rgba(244,162,97,0.3); }
+    50% { text-shadow: 0 0 50px rgba(244,162,97,0.7), 0 0 80px rgba(244,162,97,0.3); }
+  }
+
+  .subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .alex-avatar-start {
+    width: 140px;
+    height: 140px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  .quote-box {
+    background: var(--card);
+    border: 1px solid rgba(244,162,97,0.3);
+    border-radius: 16px;
+    padding: 20px 24px;
+    max-width: 520px;
+    font-style: italic;
+    color: var(--muted);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  .quote-box span { color: var(--gold); font-style: normal; font-weight: 600; }
+
+  .btn-start {
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    color: #0f0e17;
+    border: none;
+    border-radius: 50px;
+    padding: 16px 48px;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: 'Cinzel', serif;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 8px 30px rgba(244,162,97,0.4);
+  }
+
+  .btn-start:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 12px 40px rgba(244,162,97,0.6);
+  }
+
+  .level-dots {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .level-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--card2);
+    border: 2px solid rgba(244,162,97,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    font-family: 'Cinzel', serif;
+  }
+
+  .level-dot.done { background: var(--gold); border-color: var(--gold); color: #0f0e17; }
+  .level-dot.current { background: transparent; border-color: var(--gold); color: var(--gold); box-shadow: 0 0 10px rgba(244,162,97,0.5); }
+
+  /* ===== DIALOG SCREEN ===== */
+  #screen-dialog {
+    gap: 20px;
+    padding-top: 10px;
+  }
+
+  .level-header {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 16px 20px;
+    border-left: 4px solid var(--gold);
+  }
+
+  .level-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .level-title {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .level-world {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .level-objective {
+    font-size: 12px;
+    color: var(--teal);
+    margin-top: 4px;
+  }
+
+  .dialog-panel {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    flex: 1;
+    min-height: 200px;
+    border: 1px solid rgba(255,255,255,0.05);
+    animation: slideIn 0.4s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .dialog-avatar {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--card2);
+    padding: 4px;
+    border: 2px solid rgba(244,162,97,0.4);
+  }
+
+  .dialog-content { flex: 1; }
+
+  .dialog-name {
+    font-weight: 700;
+    color: var(--gold);
+    font-size: 14px;
+    margin-bottom: 10px;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+  }
+
+  .dialog-text {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text);
+    min-height: 80px;
+  }
+
+  .dialog-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .dialog-counter { font-size: 13px; color: var(--muted); }
+
+  .btn-continue {
+    background: var(--gold);
+    color: #0f0e17;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 32px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Cinzel', serif;
+  }
+
+  .btn-continue:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(244,162,97,0.4); }
+
+  /* ===== QUESTION SCREEN ===== */
+  #screen-question { gap: 20px; }
+
+  .lives-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .life-icon { font-size: 22px; transition: all 0.3s; }
+  .life-icon.lost { opacity: 0.25; filter: grayscale(1); }
+
+  .question-progress {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'Cinzel', serif;
+  }
+
+  .score-display {
+    font-size: 14px;
+    color: var(--gold);
+    font-weight: 700;
+  }
+
+  .question-box {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .question-number {
+    font-size: 11px;
+    color: var(--teal);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-family: 'Cinzel', serif;
+  }
+
+  .question-text {
+    font-size: 17px;
+    line-height: 1.7;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .answers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 500px) {
+    .answers-grid { grid-template-columns: 1fr; }
+  }
+
+  .answer-btn {
+    background: var(--card2);
+    border: 2px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 16px 18px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .answer-btn:hover:not(:disabled) {
+    border-color: var(--gold);
+    background: rgba(244,162,97,0.1);
+    transform: translateY(-2px);
+  }
+
+  .answer-btn .opt-label {
+    font-weight: 700;
+    color: var(--gold);
+    margin-right: 8px;
+    font-family: 'Cinzel', serif;
+  }
+
+  .answer-btn.correct {
+    border-color: var(--teal);
+    background: rgba(46,196,182,0.15);
+    animation: pulse-correct 0.5s ease;
+  }
+
+  .answer-btn.wrong {
+    border-color: var(--danger);
+    background: rgba(230,57,70,0.15);
+    animation: shake 0.5s ease;
+  }
+
+  .answer-btn.reveal-correct {
+    border-color: var(--teal);
+    background: rgba(46,196,182,0.1);
+  }
+
+  @keyframes pulse-correct {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+  }
+
+  .explanation-box {
+    background: rgba(46,196,182,0.1);
+    border: 1px solid rgba(46,196,182,0.3);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--teal);
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .explanation-box.show { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .explanation-box.wrong-exp {
+    background: rgba(230,57,70,0.1);
+    border-color: rgba(230,57,70,0.3);
+    color: #ff8a8a;
+  }
+
+  /* ===== BOSS SCREEN ===== */
+  #screen-boss { gap: 20px; align-items: center; }
+
+  .boss-header {
+    text-align: center;
+    font-family: 'Cinzel', serif;
+  }
+
+  .boss-label {
+    font-size: 11px;
+    color: var(--danger);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .boss-name {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--danger);
+    text-shadow: 0 0 30px rgba(230,57,70,0.5);
+    animation: bossGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes bossGlow {
+    0%, 100% { text-shadow: 0 0 20px rgba(230,57,70,0.4); }
+    50% { text-shadow: 0 0 50px rgba(230,57,70,0.8), 0 0 80px rgba(230,57,70,0.4); }
+  }
+
+  .boss-avatar-wrap {
+    animation: bossEntry 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes bossEntry {
+    from { transform: translateY(-60px) scale(0.5); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  .timer-bar-wrap {
+    width: 100%;
+    max-width: 400px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 100px;
+    height: 10px;
+    overflow: hidden;
+  }
+
+  .timer-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--gold), var(--danger));
+    border-radius: 100px;
+    transition: width 1s linear;
+  }
+
+  .timer-text {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .boss-question-box {
+    background: var(--card);
+    border: 2px solid rgba(230,57,70,0.3);
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+  }
+
+  .boss-question-text {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+
+  /* ===== REWARD SCREEN ===== */
+  #screen-reward {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 24px;
+  }
+
+  .reward-title {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--gold);
+    animation: glow 2s ease-in-out infinite;
+  }
+
+  .reward-subtitle { color: var(--muted); font-size: 15px; }
+
+  .unlock-card {
+    background: var(--card);
+    border: 2px solid var(--gold);
+    border-radius: 16px;
+    padding: 24px 32px;
+    max-width: 400px;
+    animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes scaleIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .unlock-label {
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-family: 'Cinzel', serif;
+  }
+
+  .unlock-name {
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'Cinzel', serif;
+    margin-bottom: 8px;
+  }
+
+  .unlock-desc { font-size: 14px; color: var(--muted); }
+
+  .nea-quote {
+    background: var(--card2);
+    border-radius: 12px;
+    padding: 16px 24px;
+    max-width: 480px;
+    font-style: italic;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.7;
+    border-left: 3px solid var(--gold);
+  }
+
+  .nea-quote strong { color: var(--gold); font-style: normal; }
+
+  .btn-next-level {
+    background: linear-gradient(135deg, var(--teal), #1a9e94);
+    color: #0f0e17;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 40px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    transition: all 0.2s;
+    box-shadow: 0 6px 24px rgba(46,196,182,0.4);
+  }
+
+  .btn-next-level:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(46,196,182,0.6); }
+
+  /* ===== DRAGON DISPLAY ===== */
+  .dragon-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .dragon-label { font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+
+  .dragon-svg {
+    transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  /* ===== FINAL SCREEN ===== */
+  #screen-final {
+    align-items: center;
+    text-align: center;
+    gap: 24px;
+    padding: 30px 20px;
+  }
+
+  .final-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(22px, 5vw, 36px);
+    font-weight: 900;
+    color: var(--gold);
+    text-shadow: 0 0 60px rgba(244,162,97,0.6);
+    animation: glow 2s ease-in-out infinite;
+  }
+
+  .final-subtitle { color: var(--muted); font-size: 15px; max-width: 500px; }
+
+  .allies-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .ally-card {
+    background: var(--card);
+    border: 1px solid rgba(244,162,97,0.3);
+    border-radius: 12px;
+    padding: 12px 16px;
+    text-align: center;
+    min-width: 90px;
+  }
+
+  .ally-name { font-size: 12px; color: var(--gold); font-family: 'Cinzel', serif; margin-top: 6px; }
+
+  .calculator-box {
+    background: var(--card);
+    border: 2px solid rgba(244,162,97,0.3);
+    border-radius: 20px;
+    padding: 28px;
+    max-width: 480px;
+    width: 100%;
+  }
+
+  .calculator-title {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  .calc-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .calc-label { font-size: 14px; color: var(--muted); flex: 1; min-width: 150px; }
+
+  .calc-input {
+    background: var(--card2);
+    border: 1px solid rgba(244,162,97,0.4);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 700;
+    width: 120px;
+    text-align: right;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .calc-result {
+    background: linear-gradient(135deg, rgba(244,162,97,0.1), rgba(46,196,182,0.1));
+    border: 1px solid rgba(244,162,97,0.3);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 12px;
+  }
+
+  .calc-result-big {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--gold);
+  }
+
+  .calc-result-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  .final-quotes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 500px;
+    width: 100%;
+  }
+
+  .final-quote {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--muted);
+    border-left: 3px solid var(--gold);
+    text-align: left;
+  }
+
+  .final-quote strong { color: var(--gold); }
+
+  /* ===== CONFETTI ===== */
+  .confetti-piece {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    animation: confettiFall linear forwards;
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  @keyframes confettiFall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ===== GLOBAL PROGRESS ===== */
+  .global-progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+
+  .progress-bar-wrap {
+    flex: 1;
+    background: rgba(255,255,255,0.08);
+    border-radius: 100px;
+    height: 6px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--teal));
+    border-radius: 100px;
+    transition: width 0.6s ease;
+  }
+
+  .progress-label { font-size: 12px; color: var(--muted); white-space: nowrap; font-family: 'Cinzel', serif; }
+
+  /* ===== GAME OVER ===== */
+  #screen-gameover {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .gameover-title {
+    font-family: 'Cinzel', serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--danger);
+    text-shadow: 0 0 40px rgba(230,57,70,0.6);
+  }
+
+  .btn-retry {
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 40px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    transition: all 0.2s;
+  }
+
+  .btn-retry:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(230,57,70,0.5); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- START SCREEN -->
+  <div id="screen-start" class="screen active">
+    <div class="game-logo">Frate, Eu Cum<br>Fac Bani Pe Bursă?</div>
+    <div class="subtitle">Joc educativ financiar • eBunaasta.ro</div>
+    <svg class="alex-avatar-start" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+      <!-- Body -->
+      <circle cx="70" cy="55" r="32" fill="#2d2d44"/>
+      <!-- Face -->
+      <circle cx="70" cy="50" r="22" fill="#f4a261" opacity="0.9"/>
+      <!-- Hair -->
+      <ellipse cx="70" cy="32" rx="20" ry="10" fill="#1a1a2e"/>
+      <rect x="50" y="30" width="40" height="8" fill="#1a1a2e" rx="4"/>
+      <!-- Eyes -->
+      <circle cx="63" cy="47" r="3.5" fill="#1a1a2e"/>
+      <circle cx="77" cy="47" r="3.5" fill="#1a1a2e"/>
+      <circle cx="64" cy="46" r="1.5" fill="white"/>
+      <circle cx="78" cy="46" r="1.5" fill="white"/>
+      <!-- Smile -->
+      <path d="M 62 56 Q 70 63 78 56" stroke="#1a1a2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- Headphones -->
+      <path d="M 48 45 Q 48 28 70 28 Q 92 28 92 45" stroke="#e76f51" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <rect x="44" y="43" width="10" height="14" rx="5" fill="#e76f51"/>
+      <rect x="86" y="43" width="10" height="14" rx="5" fill="#e76f51"/>
+      <!-- Body / T-shirt -->
+      <rect x="46" y="82" width="48" height="40" rx="8" fill="#16213e"/>
+      <!-- T-shirt text -->
+      <text x="70" y="106" text-anchor="middle" font-size="9" fill="#f4a261" font-family="Cinzel,serif" font-weight="700">GAMING</text>
+      <!-- Arms -->
+      <rect x="26" y="84" width="20" height="10" rx="5" fill="#2d2d44" transform="rotate(-15 36 89)"/>
+      <rect x="94" y="84" width="20" height="10" rx="5" fill="#2d2d44" transform="rotate(15 104 89)"/>
+      <!-- Coin -->
+      <circle cx="108" cy="95" r="10" fill="#f4a261" opacity="0.9"/>
+      <text x="108" y="99" text-anchor="middle" font-size="10" fill="#0f0e17" font-weight="900">₿</text>
+    </svg>
+    <div class="quote-box">
+      <span>Alex:</span> "Toată lumea zice că e simplu să faci bani pe bursă. Nimeni nu mi-a explicat cum. Ei bine, eu plec să aflu. Și îți arăt și ție tot ce găsesc pe drum."
+    </div>
+    <div class="level-dots" id="start-dots"></div>
+    <button class="btn-start" onclick="startGame()">🚀 Pornește aventura</button>
+    <div style="font-size:12px; color: var(--muted);">9 niveluri • Boss battles • Educație financiară reală</div>
+  </div>
+
+  <!-- DIALOG SCREEN -->
+  <div id="screen-dialog" class="screen">
+    <div class="global-progress">
+      <div class="progress-label" id="progress-label">Nivelul 1/9</div>
+      <div class="progress-bar-wrap"><div class="progress-bar" id="global-progress-bar" style="width:0%"></div></div>
+    </div>
+    <div class="level-header">
+      <div class="level-label" id="dialog-level-label">NIVELUL 1</div>
+      <div class="level-title" id="dialog-level-title">Pregătirea Eroului</div>
+      <div class="level-world" id="dialog-level-world">🏙️ Lumea: Orașul Datoriilor</div>
+      <div class="level-objective" id="dialog-level-objective">🎯 Ce să faci ÎNAINTE să investești</div>
+    </div>
+    <div class="dialog-panel" id="dialog-panel">
+      <svg id="dialog-avatar" class="dialog-avatar" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="dialog-content">
+        <div class="dialog-name" id="dialog-name">Alex</div>
+        <div class="dialog-text" id="dialog-text"></div>
+      </div>
+    </div>
+    <div class="dialog-controls">
+      <div class="dialog-counter" id="dialog-counter">1 / 1</div>
+      <button class="btn-continue" id="btn-continue" onclick="advanceDialog()">Continuă →</button>
+    </div>
+  </div>
+
+  <!-- QUESTION SCREEN -->
+  <div id="screen-question" class="screen">
+    <div class="global-progress">
+      <div class="progress-label" id="q-progress-label">Nivelul 1/9</div>
+      <div class="progress-bar-wrap"><div class="progress-bar" id="q-progress-bar" style="width:0%"></div></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div class="lives-bar" id="lives-bar"></div>
+      <div class="question-progress" id="q-counter">Întrebarea 1/5</div>
+      <div class="score-display" id="score-display">⭐ 0</div>
+    </div>
+    <div class="question-box">
+      <div class="question-number" id="q-number">ÎNTREBAREA 1</div>
+      <div class="question-text" id="q-text"></div>
+    </div>
+    <div class="answers-grid" id="answers-grid"></div>
+    <div class="explanation-box" id="explanation-box"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <button id="btn-prev-q" onclick="prevQuestion()" style="background:transparent; border:1px solid rgba(255,255,255,0.15); color:var(--muted); border-radius:30px; padding:10px 20px; font-size:13px; cursor:pointer; font-family:'Inter',sans-serif; transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)'">← Înapoi</button>
+      <button class="btn-continue" id="btn-next-q" onclick="nextQuestion()" style="display:none;">Următoarea →</button>
+    </div>
+  </div>
+
+  <!-- BOSS SCREEN -->
+  <div id="screen-boss" class="screen">
+    <div class="boss-header">
+      <div class="boss-label">⚔️ BOSS BATTLE</div>
+      <div class="boss-name" id="boss-name">Tentația Cheltuielilor</div>
+    </div>
+    <div class="boss-avatar-wrap">
+      <svg id="boss-avatar" viewBox="0 0 120 120" width="120" height="120" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:6px; width:100%;">
+      <div class="timer-text">⏱️ <span id="timer-display">30</span> secunde</div>
+      <div class="timer-bar-wrap"><div class="timer-bar" id="timer-bar" style="width:100%"></div></div>
+    </div>
+    <div class="boss-question-box">
+      <div class="boss-question-text" id="boss-q-text"></div>
+      <div class="answers-grid" id="boss-answers-grid"></div>
+    </div>
+    <div class="explanation-box" id="boss-explanation-box"></div>
+  </div>
+
+  <!-- REWARD SCREEN -->
+  <div id="screen-reward" class="screen">
+    <div style="font-size:48px; animation: float 2s ease-in-out infinite;">🏆</div>
+    <div class="reward-title">Nivel completat!</div>
+    <div class="reward-subtitle" id="reward-subtitle">Ai trecut de Nivelul 1</div>
+    <div class="unlock-card" id="unlock-card">
+      <div class="unlock-label">🔓 Deblocat</div>
+      <div class="unlock-name" id="unlock-name">Nea Emil</div>
+      <div class="unlock-desc" id="unlock-desc">Mentorul tău. Veteran al burselor din 2008.</div>
+    </div>
+    <div class="dragon-display" id="dragon-display">
+      <div class="dragon-label">🐉 Dragonul Compus</div>
+      <svg id="dragon-reward" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="dragon-svg"></svg>
+      <div style="font-size:12px; color:var(--muted);" id="dragon-level-text">Nivel 1 — Pui de dragon</div>
+    </div>
+    <div class="nea-quote" id="nea-quote-reward"></div>
+    <button class="btn-next-level" id="btn-next-level" onclick="nextLevel()">Nivelul următor →</button>
+  </div>
+
+  <!-- GAME OVER SCREEN -->
+  <div id="screen-gameover" class="screen">
+    <div style="font-size:56px;">💀</div>
+    <div class="gameover-title">Alex a cedat!</div>
+    <div style="color:var(--muted); font-size:15px; max-width:380px; line-height:1.7;">
+      Nea Emil zice: "Nu-i nimic, băiete. Nici eu n-am înțeles din prima. Hai s-o luăm de la capăt!"
+    </div>
+    <div class="score-display" style="font-size:20px;" id="gameover-score">⭐ 0 puncte</div>
+    <button class="btn-retry" onclick="retryLevel()">↺ Încearcă din nou</button>
+    <button class="btn-continue" onclick="startGame()" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:var(--muted);">🏠 Start</button>
+  </div>
+
+  <!-- FINAL SCREEN -->
+  <div id="screen-final" class="screen">
+    <div style="font-size:60px; animation: float 2s ease-in-out infinite;">💰</div>
+    <div class="final-title">Alex a găsit Comoara!</div>
+    <div class="final-subtitle">La 19 ani, Alex știe mai multe despre finanțe decât 90% din adulții din România.</div>
+    <div class="dragon-display">
+      <div class="dragon-label">🐉 Dragonul Compus — forma finală</div>
+      <svg id="dragon-final" viewBox="0 0 160 160" width="160" height="160" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div class="allies-row" id="final-allies"></div>
+    <div class="calculator-box">
+      <div class="calculator-title">🧮 Calculatorul Independenței Financiare</div>
+      <div class="calc-row">
+        <div class="calc-label">Vârsta ta acum (ani):</div>
+        <input class="calc-input" type="number" id="calc-age" value="25" min="16" max="70" oninput="updateCalc()">
+      </div>
+      <div class="calc-row">
+        <div class="calc-label">Suma investită lunar (lei):</div>
+        <input class="calc-input" type="number" id="calc-monthly" value="300" min="50" max="50000" oninput="updateCalc()">
+      </div>
+      <div class="calc-row">
+        <div class="calc-label">Cheltuieli lunare dorite (lei):</div>
+        <input class="calc-input" type="number" id="calc-expenses" value="3000" min="500" max="100000" oninput="updateCalc()">
+      </div>
+      <div class="calc-row">
+        <div class="calc-label">Randament estimat (%/an):</div>
+        <input class="calc-input" type="number" id="calc-rate" value="8" min="1" max="20" oninput="updateCalc()">
+      </div>
+      <div class="calc-result">
+        <div style="font-size:13px; color:var(--muted); margin-bottom:10px;" id="calc-target-label">Portofoliu necesar (regula 4%): <strong style="color:var(--gold)" id="calc-target-value">900.000 lei</strong></div>
+        <div class="calc-result-big" id="calc-result-value">1.547.892 lei</div>
+        <div class="calc-result-label" id="calc-result-label">la 65 ani (46 ani de investit)</div>
+        <div style="margin-top:10px; padding:10px; background:rgba(46,196,182,0.1); border-radius:8px;" id="calc-fi-box">
+          <div style="font-size:15px; font-weight:700; color:var(--teal);" id="calc-fi-age">🎯 Independență financiară la ~45 ani</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:4px;" id="calc-fi-detail">după 26 ani de investit</div>
+        </div>
+        <div style="margin-top:8px; font-size:12px; color:var(--muted); font-style:italic;">* Bazat pe regula celor 4% și randament mediu istoric</div>
+      </div>
+    </div>
+    <div class="final-quotes">
+      <div class="final-quote"><strong>Nea Emil:</strong> "Ți-am spus eu. Secretul nu e să fii deștept. E să începi."</div>
+      <div class="final-quote"><strong>Mia:</strong> "Acum știi mai multe despre finanțe decât 90% din adulții din România."</div>
+      <div class="final-quote"><strong>FinBot:</strong> "Portofoliu proiectat: <span id="finbot-projection">1.547.892</span> lei la 65 ani. Probabilitate succes: 94%."</div>
+      <div class="final-quote"><strong>Alex:</strong> "Frate, eu chiar fac bani pe bursă!" 🎉</div>
+    </div>
+    <button class="btn-start" onclick="startGame()">🔄 Joacă din nou</button>
+  </div>
+
+</div>
+
+<script>
+// ===== GAME DATA =====
+const LEVELS = [
+  {
+    id: 1,
+    title: "Pregătirea Eroului",
+    world: "🏙️ Lumea: Orașul Datoriilor",
+    objective: "🎯 Ce să faci ÎNAINTE să investești",
+    boss: { name: "Tentația Cheltuielilor", type: "temptation" },
+    unlock: { name: "Nea Emil", desc: "Mentorul tău. Veteran al burselor din 2008.", color: "#f4a261" },
+    neaQuote: "Ai supraviețuit primei capcane. Cei mai mulți oameni cad aici. Tu nu. Mergem mai departe.",
+    dialogs: [
+      { speaker: "Alex", text: "Nea Emil! Am 2.000 de lei din primul sponsorship și vreau să-i bag la bursă. Să devin bogat rapid!" },
+      { speaker: "Nea Emil", text: "Bogat rapid... Ha! Fraierul se aruncă în bursă. Deșteptul se pregătește mai întâi. Ai datorii, băiete?" },
+      { speaker: "Alex", text: "Păi... mai am 4 rate la telefon. 150 lei pe lună fiecare. Dar sunt mici, nu?" },
+      { speaker: "Nea Emil", text: "Mici?! 600 de lei pe lună duc la bursă?! Ăla e primul tău dușman financiar. Dobânda la rate bate orice ETF. Hai să ucidem datoria întâi, apoi cucerim bursa. Există 7 pași obligatorii înainte să dai primul leu pe acțiuni." }
+    ],
+    questions: [
+      {
+        text: "Alex are 2.000 lei. Mai are 4 rate la telefon de 150 lei/lună fiecare. Ce ar trebui să facă PRIMUL?",
+        options: ["Să cumpere acțiuni imediat, că prețurile cresc", "Să cumpere crypto, că e mai rapid", "Să pună toți banii într-un depozit bancar", "Să plătească rata și să elimine datoria înainte de a investi"],
+        correct: 3,
+        explanation: "Datoriile de consum au dobândă mare (10-40%/an). Nicio investiție normală nu bate sigur această dobândă. Se elimină datoria mai întâi."
+      },
+      {
+        text: "Ce este fondul de urgență și cât de mare trebuie să fie?",
+        options: ["Bani puși în acțiuni pe termen scurt, 500 lei", "Economii echivalente cu 3-6 salarii lunare, păstrate lichid", "Toate economiile tale investite în aur", "Nu e necesar dacă ai card de credit"],
+        correct: 1,
+        explanation: "Fondul de urgență acoperă cheltuieli neprevăzute (boală, reparații, pierderea jobului) fără să fii nevoit să vinzi investiții la un preț prost."
+      },
+      {
+        text: "Ce înseamnă 'plătește-te pe tine primul'?",
+        options: ["Pune deoparte economii la începutul lunii, înainte de alte cheltuieli", "Cumpără-ți ce vrei înainte de a plăti facturile", "Investește tot salariul în bursă", "Plătește-ți datoriile înaintea oricărei alte cheltuieli"],
+        correct: 0,
+        explanation: "Economisirea la început de lună (nu cu ce rămâne la final) este cheia formării unei rutine financiare. Suma mică contează mai puțin decât consecvența."
+      },
+      {
+        text: "Alex vrea să investească, dar nu are un obiectiv clar. Ce risc apare?",
+        options: ["Nu apare niciun risc, banii cresc oricum", "Poate vinde în panică când piața scade, pentru că nu știe de ce a investit", "Va câștiga mai mult fără un plan", "Brokerul îi va spune el ce să facă"],
+        correct: 1,
+        explanation: "Fără un obiectiv clar (termen, sumă, scop), orice scădere a pieței pare o catastrofă și tentația de a vinde în pierdere este uriașă."
+      },
+      {
+        text: "Care dintre următorii brokeri este CEL MAI sigur de utilizat?",
+        options: ["Un prieten care promite 50% câștig lunar", "O aplicație cu meme-coins găsită pe TikTok", "Un broker autorizat și reglementat de o autoritate financiară recunoscută (ASF, FCA, SEC)", "Orice platformă care promite zero comisioane la totul"],
+        correct: 2,
+        explanation: "Brokerul trebuie să fie autorizat de o autoritate serioasă. Promisiunile de randamente garantate sau extrem de mari sunt semnale de alarmă (posibilă fraudă)."
+      }
+    ],
+    bossQuestion: {
+      text: "Alex are 2.000 lei economisiți și NU are fond de urgență. Prietenul îi oferă un setup de gaming la 'super-ofertă'. Ce face?",
+      options: ["Cumpără setupul — e o ofertă unică", "NU cumpără. Construiește mai întâi fondul de urgență", "Împrumută bani în plus pentru setup", "Pune 1.000 lei pe setup și 1.000 lei pe bursă"],
+      correct: 1,
+      explanation: "NU cumpără setupul. Își construiește mai întâi fondul de urgență (cel puțin 1 salariu), stabilește un obiectiv și abia apoi investește restul."
+    }
+  },
+  {
+    id: 2,
+    title: "Banii și Cum Cresc",
+    world: "🌲 Lumea: Pădurea Dobânzilor",
+    objective: "🎯 Valoarea banilor în timp, dobânda compusă, inflația",
+    boss: { name: "Inflația", type: "inflation" },
+    unlock: { name: "Compus — Dragonul", desc: "Dobânda compusă personificată. Mic acum, uriaș la final.", color: "#2ec4b6" },
+    neaQuote: "Dacă ții banii în cont fără dobândă, te fură cineva în fiecare an. Se numește Inflație. Acum știi cum o bați.",
+    dialogs: [
+      { speaker: "Alex", text: "Gata, am fondul de urgență! Am rezistat tentației setupului. Ce fac acum cu restul banilor? Îi las în cont?" },
+      { speaker: "Nea Emil", text: "În cont? Fără dobândă? Felicitări, tocmai ai angajat un hoț invizibil. Se numește Inflație și nu ia concediu niciodată." },
+      { speaker: "Alex", text: "Adică pierd bani stând cu ei în bancă?! Asta e absurd!" },
+      { speaker: "Nea Emil", text: "Bun venit la viața de adult. 1.000 lei azi nu mai sunt 1.000 lei peste 20 ani. Dar există un antidot: dobânda compusă. Einstein zicea că e a 8-a minune a lumii. Și Einstein nu glumea des." }
+    ],
+    questions: [
+      {
+        text: "Alex ține 1.000 lei în cont fără dobândă. Inflația este 5%/an. Ce se întâmplă după 1 an?",
+        options: ["Are tot 1.000 lei — suma nu s-a schimbat", "Poate cumpăra mai puține lucruri cu aceiași 1.000 lei", "A câștigat 50 lei automat", "Inflația nu afectează conturile bancare"],
+        correct: 1,
+        explanation: "Inflația erodează puterea de cumpărare. Dacă prețurile cresc 5% și tu nu ai randament, în termeni reali ai mai puțini bani — chiar dacă suma numerică rămâne aceeași."
+      },
+      {
+        text: "Ce este dobânda compusă, în termeni simpli?",
+        options: ["Dobânda plătită la bancă pentru împrumuturi", "Dobânda care se calculează și pe dobânzile anterioare, nu doar pe suma inițială", "Un tip de cont cu risc ridicat", "O taxă ascunsă a brokerilor"],
+        correct: 1,
+        explanation: "Einstein ar fi spus că dobânda compusă e 'a opta minune a lumii'. Banii câștigă bani, care la rândul lor câștigă alți bani — efectul crește exponențial în timp."
+      },
+      {
+        text: "Aplicând Regula lui 72: la un randament de 9%/an, în câți ani se dublează banii?",
+        options: ["18 ani", "9 ani", "8 ani", "72 ani"],
+        correct: 2,
+        explanation: "72 / 9 = 8 ani. Regula lui 72 este o aproximare rapidă și utilă pentru a înțelege puterea dobânzii compuse fără calcule complicate."
+      },
+      {
+        text: "Alex are 19 ani și investește 200 lei/lună la un randament mediu de 8%/an. La 45 ani, cât ar putea avea?",
+        options: ["Aproximativ 10.000 lei", "Aproximativ 50.000 lei", "Aproximativ 175.000 lei", "Nu poți estima așa ceva"],
+        correct: 2,
+        explanation: "Prin calculul valorii viitoare a unei anuități (200 lei/lună, 8%/an, 26 ani), suma se apropie de 175.000 lei. Aceasta demonstrează puterea timpului și a consecvenței."
+      }
+    ],
+    bossQuestion: {
+      text: "Inflația este 6%/an. Care variantă bate CEL MAI MULT inflația pe termen lung?",
+      options: ["Contul curent (0%)", "Depozit la 4%", "Titluri de stat la 6%", "ETF pe indice global (randament mediu istoric 8-10%/an)"],
+      correct: 3,
+      explanation: "C (titluri de stat 6%) egalează inflația — nu pierzi, dar nici nu câștigi în termeni reali. D (ETF global) bate inflația cel mai mult: randamentul mediu istoric de 8-10%/an depășește semnificativ cei 6%. Alex deblochează Dragonul Compus!"
+    }
+  },
+  {
+    id: 3,
+    title: "Instrumentele Investitorului",
+    world: "⚔️ Lumea: Arsenalul Financiar",
+    objective: "🎯 Ce instrumente financiare există și cum funcționează",
+    boss: { name: "Confuzia Produselor", type: "confusion" },
+    unlock: { name: "Mia", desc: "Absolventă de Finanțe. Îți explică orice termen financiar.", color: "#9b59b6" },
+    neaQuote: "Mia e cel mai bun prieten al unui investitor care nu înțelege jargonul. Păstrează-o aproape.",
+    dialogs: [
+      { speaker: "Mia", text: "Alex! Ai supraviețuit Inflației. Bine ai venit la nivelul următor. Eu sunt Mia, absolventă de Finanțe, și nu o să te las să cumperi prostii." },
+      { speaker: "Alex", text: "Prostii? Eu am cercetări serioase pe TikTok..." },
+      { speaker: "Mia", text: "TikTok. Bine. Hai cu arsenalul real: Acțiunea e SABIA — putere mare, risc mare. Obligațiunea e SCUTUL — plictisitoare, dar te salvează. ETF-ul e ARMURA completă, 500 companii dintr-o singură lovitură." },
+      { speaker: "Alex", text: "Ok, ok. Și care o iau?" },
+      { speaker: "Mia", text: "Tu, cu 2.000 lei și zero experiență? ETF-ul. Fără discuție. Diversifici automat, costuri mici, nu trebuie să ghicești care companie supraviețuiește." }
+    ],
+    questions: [
+      {
+        text: "Ce se întâmplă cu banii tăi dacă cumperi o acțiune a companiei X și aceasta dă faliment?",
+        options: ["Recuperezi toți banii prin asigurare", "Poți pierde toată suma investită în acea acțiune", "Statul îți returnează jumătate", "Acțiunile nu pot ajunge la zero"],
+        correct: 1,
+        explanation: "Acțiunile nu sunt garantate. Dacă o companie falimentează, acționarii sunt ultimii plătiți din activele rămase — de obicei nu rămâne nimic pentru ei."
+      },
+      {
+        text: "De ce un ETF pe indicele S&P 500 este recomandat începătorilor?",
+        options: ["Garantează un câștig de 10%/an", "E mai profitabil decât orice acțiune individuală", "Nu are niciun risc de pierdere", "Oferă expunere la 500 companii mari americane printr-o singură tranzacție, la costuri mici"],
+        correct: 3,
+        explanation: "Un ETF diversifică automat riscul — dacă o companie merge rău, celelalte 499 compensează. Costurile sunt mici (0,03-0,2%/an) față de fondurile active."
+      },
+      {
+        text: "Care instrument are CEL MAI MIC risc pentru un începător român?",
+        options: ["Acțiuni pe companii mici de la BVB", "Crypto (Bitcoin)", "Titluri de stat garantate de statul român", "CFD-uri cu levier"],
+        correct: 2,
+        explanation: "Titlurile de stat sunt garantate de stat. În România, Fidelis și Tezaur sunt accesibile online și oferă dobândă fixă, fără risc de pierdere a capitalului."
+      },
+      {
+        text: "Mia îi spune lui Alex: 'Nu pune 2.000 lei pe o singură acțiune.' De ce?",
+        options: ["E ilegal să investești toată suma într-un singur loc", "Dacă acea companie merge rău, Alex pierde tot. Diversificarea reduce riscul.", "Nicio companie nu acceptă mai puțin de 10.000 lei", "Trebuie să aștepte 6 luni înainte de prima investiție"],
+        correct: 1,
+        explanation: "Diversificarea este principiul fundamental al gestionării riscului: 'Nu pune toate ouăle într-un singur coș.' Un ETF face asta automat."
+      }
+    ],
+    bossQuestion: {
+      text: "Un site îi promite lui Alex '30% câștig garantat pe lună, fără risc, investiție minimă 500 lei'. Ce face Alex?",
+      options: ["Investește imediat — e o oportunitate rară", "NU investește — e semnal clar de fraudă (schemă Ponzi)", "Investește jumătate, să fie precaut", "Cere mai multe detalii și apoi investește"],
+      correct: 1,
+      explanation: "Randamentele garantate și extrem de mari (30%/lună = 360%/an) sunt semnale clare de fraudă. Alex raportează site-ul la ASF."
+    }
+  },
+  {
+    id: 4,
+    title: "Bursa pe Înțelesul Tuturor",
+    world: "📈 Lumea: Piața Mare",
+    objective: "🎯 Cum funcționează bursa, indici, grafice simple, emoții",
+    boss: { name: "Panica și Euforia", type: "panic" },
+    unlock: { name: "Graficul Istoriei", desc: "Vizualizezi toate crizele din ultimii 100 ani și recuperările.", color: "#e74c3c" },
+    neaQuote: "Frica și lăcomia sunt cei mai mari dușmani ai investitorului. Acum știi să le recunoști.",
+    dialogs: [
+      { speaker: "Alex", text: "Nea Emil, am instrumentele. Dar bursa asta... de ce sare în sus și cade ca nebuna? Cine o controlează?" },
+      { speaker: "Nea Emil", text: "Nimeni. Toată lumea. Depinde de zi. E ca o piață de vechituri cu companii: când vor toți să cumpere, prețul urcă. Când toți vor să scape, cade. Atât. Restul e panică și lăcomie." },
+      { speaker: "Alex", text: "Deci e psihologie, nu matematică?" },
+      { speaker: "Nea Emil", text: "Pe termen scurt, da. Psihologie pură. Pe termen lung câștigă cel plictisitor, care nu face nimic. Buffett a rezumat-o bine: bursa transferă bani de la nerăbdători la răbdători." }
+    ],
+    questions: [
+      {
+        text: "S&P 500 scade cu 15% într-o lună. Ce face Alex?",
+        options: ["Împrumută bani și cumpără mai mult", "Vinde tot imediat, să nu piardă mai mult", "Nu face nimic — o corecție de 15% e normală într-o piață pe termen lung", "Mută tot în crypto"],
+        correct: 2,
+        explanation: "Corecțiile de 10-20% sunt normale și frecvente. Vânzarea în panică transformă o pierdere temporară într-una permanentă. Pe termen lung (10+ ani), piața a revenit mereu."
+      },
+      {
+        text: "Toată lumea pe TikTok vorbește despre o acțiune care a crescut 200% luna trecută. Alex ce face?",
+        options: ["Cumpără imediat, altfel pierde trenul", "Cercetează compania, înțelege de ce a crescut, și decide după analiză — nu după hype", "Împarte sfatul și el cu alți prieteni", "Bursa e pentru bogați, nu pentru el"],
+        correct: 1,
+        explanation: "Când 'toată lumea' vorbește despre o acțiune, cel mai probabil cei care au cumpărat devreme au deja profit și caută să vândă. Intrările pe baza de hype se termină de obicei în pierdere."
+      },
+      {
+        text: "Ce este un indice bursier?",
+        options: ["Un indicator care măsoară performanța medie a unui grup de companii sau a pieței", "O listă de companii recomandate de guvern pentru investiții sigure", "Prețul unei acțiuni speciale emise de banca centrală", "Un tip de obligațiune cu risc redus"],
+        correct: 0,
+        explanation: "Un indice (S&P 500, BET, MSCI World) măsoară evoluția unui grup reprezentativ de companii. Urmărind un indice printr-un ETF, investești în toată piața, nu într-o singură companie."
+      },
+      {
+        text: "Alex a investit 1.000 lei. Piața scade 30% (acum are 700 lei). Dacă nu vinde acum și piața revine cu 30%, ce sumă are în cont?",
+        options: ["1.000 lei — a revenit la start", "910 lei — nu a revenit complet", "1.100 lei — a câștigat extra", "700 lei — pierderea e permanentă"],
+        correct: 1,
+        explanation: "Matematica pierderilor e asimetrică: -30% necesită +43% pentru a reveni la 0 (nu +30%). 700 lei + 30% = 910 lei. De aceea managementul riscului e critic."
+      }
+    ],
+    bossQuestion: {
+      text: "Alex are 2.000 lei investiți în ETF. În 3 zile a pierdut 500 lei 'pe hârtie'. Toți urmăritorii îi spun să vândă. Ce face?",
+      options: ["Vinde tot — pierderea crește", "Nu vinde — o pierdere pe hârtie devine reală DOAR dacă vinzi", "Vinde jumătate, să fie precaut", "Mută tot în depozit bancar"],
+      correct: 1,
+      explanation: "O pierdere 'pe hârtie' devine reală doar dacă vinzi. Dacă orizontul de timp e lung (10+ ani), un crash e o oportunitate de cumpărare la preț redus."
+    }
+  },
+  {
+    id: 5,
+    title: "Știința Riscului",
+    world: "🌀 Lumea: Labirintul Incertitudinii",
+    objective: "🎯 Diversificare, profil de risc, bias-uri comportamentale",
+    boss: { name: "FOMO și Lăcomia", type: "fomo" },
+    unlock: { name: "FinBot", desc: "AI financiar. Calculează și compară în timp real.", color: "#2ec4b6" },
+    neaQuote: "Acum ai pierdut bani virtuali. Asta e mult mai ieftin decât să fi învățat lecția asta cu bani reali.",
+    dialogs: [
+      { speaker: "FinBot", text: "Alex. Sunt FinBot. Am scanat comportamentul tău din ultimele niveluri. Risc FOMO: 87%. Risc lăcomie: 74%. Risc panică: 61%. Avem treabă." },
+      { speaker: "Alex", text: "Stai, cum adică 87%? Eu sunt rațional!" },
+      { speaker: "FinBot", text: "Toți cred că sunt raționali. Nimeni nu e. FOMO te face să cumperi când toți cumpără la vârf și să vinzi când toți vând la fund. Adică exact invers. Felicitări." },
+      { speaker: "Mia", text: "Și mai e Confirmation Bias: cauți doar știri care confirmă ce vrei să auzi. Un investitor serios citește și argumentele împotrivă. Mai ales pe alea." }
+    ],
+    questions: [
+      {
+        text: "Alex are 2.000 lei. Cum îi diversifică corect pentru un profil MODERAT?",
+        options: ["1.000 lei crypto + 1.000 lei într-un fond cu 30%/an garantat", "2.000 lei într-o singură acțiune pe care o cunoaște bine", "Îi ține toți în contul curent până găsește ceva sigur", "1.400 lei în ETF global + 400 lei titluri de stat + 200 lei rezervă cash"],
+        correct: 3,
+        explanation: "Un portofoliu moderat combină active cu creștere (ETF acțiuni) cu active stabile (obligațiuni) și lichiditate (cash). Nicio poziție nu trebuie să domine complet."
+      },
+      {
+        text: "Un prieten câștigă 500% pe o monedă crypto în 2 săptămâni. Alex simte FOMO puternic. Ce face?",
+        options: ["Pune imediat toți banii în aceeași monedă", "Analizează rece: dacă a crescut 500% deja, riscul de corecție severă e uriaș. Decide după analiză, nu după emoție.", "Împrumută bani ca să intre și el", "Își face cont pe 5 platforme de crypto"],
+        correct: 1,
+        explanation: "Când auzi de câștiguri spectaculoase deja realizate, ești printre ultimii care intră. Maximul e probabil aproape. FOMO te face să cumperi la vârful prețului."
+      },
+      {
+        text: "Ce înseamnă 'risc maxim 1% per tranzacție'?",
+        options: ["Investești maxim 1% din avere în total la bursă", "Dacă o poziție merge împotriva ta, pierzi maxim 1% din capitalul total al portofoliului", "Taxa de broker e maxim 1%", "Randamentul anual nu poate depăși 1%"],
+        correct: 1,
+        explanation: "Regula de 1% pe tranzacție înseamnă că setezi stop-loss-ul astfel încât, dacă te înșeli complet, pierzi maxim 1% din portofoliu pe acea tranzacție."
+      },
+      {
+        text: "Alex caută informații despre o acțiune și citește DOAR articole pozitive despre ea, ignorând-le pe cele negative. Ce bias are?",
+        options: ["FOMO", "Confirmation Bias (bias de confirmare)", "Panic Selling", "Loss Aversion"],
+        correct: 1,
+        explanation: "Confirmation Bias — căutăm informații care confirmă credințele existente și le ignorăm pe cele care le contrazic. Un investitor bun citește și teza bearish despre orice investiție."
+      }
+    ],
+    bossQuestion: {
+      text: "Pe contul demo, FOMO îl face pe Alex să investească 500 lei virtuali într-o 'monedă' pe hype. În 3 zile pierde 400 lei (80%). Ce lecție a învățat?",
+      options: ["Trebuia să investească mai mult, să recupereze", "Contul demo nu e real, n-a contat", "FOMO și lăcomia sunt cei mai mari dușmani ai investitorului", "Crypto e întotdeauna o fraudă"],
+      correct: 2,
+      explanation: "Lecția nu e că crypto e bună sau rea, ci că deciziile luate din FOMO și lăcomie, fără analiză, duc la pierderi. Pe bani virtuali — mai ieftin de învățat!"
+    }
+  },
+  {
+    id: 6,
+    title: "Analiza Fundamentală",
+    world: "🔬 Lumea: Laboratorul Companiilor",
+    objective: "🎯 Cum analizezi o companie — indicatori de bază",
+    boss: { name: "Rapoartele Financiare", type: "reports" },
+    unlock: { name: "Lupa Fundamentală", desc: "Poți scana orice companie cu indicatorii învățați.", color: "#f39c12" },
+    neaQuote: "Analiza fundamentală îți spune CE să cumperi. Nu uita asta niciodată.",
+    dialogs: [
+      { speaker: "Mia", text: "Acum știi să nu pierzi bani aiurea. Felicitări, ești mai deștept decât jumătate din investitorii de pe TikTok. Acum vine partea bună: cum ALEGI o companie bună. Asta e analiza fundamentală." },
+      { speaker: "Alex", text: "Mă uit la cifre? Eu am evitat matematica toată viața." },
+      { speaker: "Mia", text: "Trei cifre. Atât. P/E: cât plătești per leu de profit. ROE: cât e de eficientă compania. FCF: banii reali, nu cei inventați de contabili." },
+      { speaker: "Alex", text: "P/E cât să fie? Mare e bun sau mic?" },
+      { speaker: "Mia", text: "10-20 e ok. Peste 40 înseamnă că lumea speculează viitorul companiei. Dacă nu știi exact de ce e atât de mare, mai bine treci mai departe. Sau cum zice Nea Emil: fraierul rămâne cu speculația." }
+    ],
+    questions: [
+      {
+        text: "O acțiune are P/E = 50. Ce înseamnă asta?",
+        options: ["Compania are 50 de angajați", "Investitorii plătesc 50 lei pentru fiecare 1 leu de profit anual al companiei — o evaluare ridicată", "Acțiunea a crescut 50% în ultimul an", "Dividendul este de 50 lei pe acțiune"],
+        correct: 1,
+        explanation: "P/E = 50 înseamnă că piața plătește o primă mare pentru creștere viitoare așteptată. Dacă creșterea nu se materializează, acțiunea poate corecta sever."
+      },
+      {
+        text: "Compania A are profit de 1 milion lei dar FCF (flux numerar liber) negativ. Ce ar trebui să înțeleagă Alex?",
+        options: ["E în regulă, profitul e cel mai important indicator", "Profitul contabil poate include venituri neîncasate. FCF negativ înseamnă că banii reali ies mai repede decât intră — semnal de alarmă.", "Compania e cu siguranță o fraudă", "Ar trebui să cumpere imediat, e subevaluată"],
+        correct: 1,
+        explanation: "Profitul contabil și fluxul de numerar sunt diferite. O companie poate raporta profit dar să nu aibă bani reali. FCF negativ persistent fără justificare clară e un semnal de prudență."
+      },
+      {
+        text: "Alex compară două companii: ROE 8% vs ROE 22%. Ce înseamnă asta, în general?",
+        options: ["Compania cu ROE 8% e mai bună pentru că are ROE mai mic", "ROE nu are importanță în analiză", "Compania cu ROE 8% e mai sigură întotdeauna", "Compania cu ROE 22% generează mai mult profit din capitalul investit — e mai eficientă"],
+        correct: 3,
+        explanation: "ROE (Return on Equity) măsoară eficiența cu care compania folosește capitalul acționarilor. Un ROE ridicat și sustenabil indică o companie cu avantaj competitiv."
+      }
+    ],
+    bossQuestion: {
+      text: "Alex analizează 2 companii: ALPHA (P/E=15, ROE=20%, FCF pozitiv, datorii mici, creștere 15%/an) vs BETA (P/E=45, ROE=8%, FCF negativ, datorii mari, venituri -5%). Pe care o alege?",
+      options: ["BETA — P/E mare înseamnă companie importantă", "ALPHA — toți indicatorii sunt pozitivi și sustenabili", "Niciuna — sunt prea riscante", "Le cumpără pe amândouă pentru diversificare"],
+      correct: 1,
+      explanation: "ALPHA câștigă clar: P/E rezonabil, ROE bun, FCF pozitiv, datorii mici și creștere solidă. BETA are toți indicatorii negativi."
+    }
+  },
+  {
+    id: 7,
+    title: "Analiza Tehnică",
+    world: "📊 Lumea: Cetatea Graficelor",
+    objective: "🎯 Trenduri, medii mobile, RSI, suport și rezistență",
+    boss: { name: "Zgomotul Pieței", type: "noise" },
+    unlock: { name: "Filtrul de Zgomot", desc: "Poți analiza complet orice acțiune, combinând fundamentele cu tehnicul.", color: "#3498db" },
+    neaQuote: "Analiza fundamentală îți spune CE să cumperi. Analiza tehnică îți spune CÂND. Acum le ai pe amândouă.",
+    dialogs: [
+      { speaker: "FinBot", text: "Alex. Fundamentala îți spune CE să cumperi. Tehnica îți spune CÂND. Fără amândouă ești pe jumătate orb. Hai cu graficele." },
+      { speaker: "Alex", text: "Graficele cu lumânări alea? Arată ca hieroglife." },
+      { speaker: "FinBot", text: "Axa X e timp. Axa Y e preț. MA200 e media ultimelor 200 de zile. Prețul peste MA200: trend pozitiv. RSI sub 30: posibil moment bun de cumpărat. Ierarhioglefele sunt simple când știi cheia." },
+      { speaker: "Mia", text: "Și tehnica singură nu funcționează. O companie proastă cu grafic frumos e tot o companie proastă. Combini: fundamente solide plus moment tehnic bun. Altfel dai cu banul." }
+    ],
+    questions: [
+      {
+        text: "Acțiunea X are prețul la 100 lei, MA50 la 95 lei și MA200 la 80 lei. Ce indică asta?",
+        options: ["Acțiunea e în trend descendent, trebuie vândută urgent", "Acțiunea e în trend ascendent (preț > MA50 > MA200) — semnal tehnic pozitiv", "MA200 la 80 înseamnă că acțiunea va ajunge la 80 lei", "Mediile mobile nu au relevanță"],
+        correct: 1,
+        explanation: "Configurația preț > MA50 > MA200 este considerată bullish (pozitivă) în analiza tehnică. Arată că prețul e deasupra mediei pe termen scurt și lung."
+      },
+      {
+        text: "RSI-ul unei acțiuni este 28. Ce sugerează asta unui analist tehnic?",
+        options: ["Acțiunea e supracumpărată și trebuie vândută", "Acțiunea poate fi supravândută — prețul a scăzut rapid și ar putea fi o oportunitate (cu confirmare)", "RSI de 28 e un semnal neutru", "Acțiunea va continua să scadă la 0"],
+        correct: 1,
+        explanation: "RSI sub 30 sugerează că acțiunea a fost vândută agresiv și poate fi supravândută. Nu e garanție de revenire, dar e un semnal de căutare de confirmare."
+      },
+      {
+        text: "Care este diferența principală între analiza fundamentală și analiza tehnică?",
+        options: ["Fundamentală e pentru bursele străine, tehnică e pentru BVB", "Fundamentală analizează sănătatea companiei (cifre, profit, bilanț). Tehnică analizează mișcările de preț.", "Tehnica e mai precisă decât fundamentala întotdeauna", "Sunt același lucru cu denumiri diferite"],
+        correct: 1,
+        explanation: "Un investitor complet le folosește pe ambele: fundamentală pentru a alege CE să cumpere (companie solidă), tehnică pentru a alege CÂND să intre (preț bun, trend favorabil)."
+      }
+    ],
+    bossQuestion: {
+      text: "Acțiunea Y: fundamente solide (P/E=18, ROE=22%), preț peste MA200, RSI=45 (neutru). Azi apare o știre negativă pe un blog anonim. Ce face Alex?",
+      options: ["Vinde imediat — știrea e îngrijorătoare", "Ignoră știrea anonimă. Datele obiective sunt pozitive. Continuă să țină poziția.", "Cumpără mai mult — e oportunitate", "Caută confirmarea știrii pe alte 10 bloguri"],
+      correct: 1,
+      explanation: "Ignoră știrile anonime. Datele obiective (fundamente + tehnic) sunt pozitive. Continuă să țină poziția și monitorizează surse oficiale (rapoarte trimestriale)."
+    }
+  },
+  {
+    id: 8,
+    title: "Construirea Portofoliului",
+    world: "🏰 Lumea: Fortăreața Activelor",
+    objective: "🎯 Alocare, DCA, rebalansare, impozitare, primul portofoliu",
+    boss: { name: "Comisioanele Ascunse", type: "fees" },
+    unlock: { name: "Calculatorul Portofoliului", desc: "Vezi proiecția portofoliului tău real în 10, 20, 30 ani.", color: "#27ae60" },
+    neaQuote: "DCA și răbdarea. Asta e tot secretul. Restul e zgomot.",
+    dialogs: [
+      { speaker: "Alex", text: "Ok. Știu ce să cumpăr, știu când să cumpăr. Acum: cum pun asta în practică cu 200 de lei pe lună? Că nu sunt Buffett." },
+      { speaker: "FinBot", text: "200 lei e perfect. Modelul moderat: 120 lei ETF global, 50 lei titluri de stat, 20 lei cash rezervă, 10 lei altceva. Nu complica. Funcționează." },
+      { speaker: "Alex", text: "Și cumpăr tot odată sau pic cu pic?" },
+      { speaker: "FinBot", text: "Pic cu pic. În fiecare lună, aceeași sumă, indiferent de preț. Se numește DCA. Când prețul scade, iei mai mult. Când crește, iei mai puțin. Nu ghicești nimic. Nu stresezi. Funcționează." },
+      { speaker: "Mia", text: "Un lucru important: impozitele. Contează unde are sediul brokerul tău. Broker român, impozitul e reținut automat. Broker străin ca eToro sau IBKR, declari tu la ANAF. Regulile se schimbă des, verifică anaf.ro sau întreabă un contabil înainte să dai declarații." }
+    ],
+    questions: [
+      {
+        text: "Alex investește 200 lei/lună cu DCA. În luna 1 acțiunile costă 10 lei/bucată, în luna 2 costă 5 lei. Ce se întâmplă?",
+        options: ["A pierdut bani și ar fi trebuit să aștepte", "În luna 1 a cumpărat 20 unități, în luna 2 a cumpărat 40 unități. Are 60 unități la un cost mediu de 6,67 lei — mai mic decât prețul inițial.", "DCA nu funcționează când prețul scade", "Ar trebui să cumpere mai mult în luna 1, când prețul e mare"],
+        correct: 1,
+        explanation: "DCA funcționează PENTRU TINE când prețul scade: cumperi mai multe unități cu aceeași sumă. Pe termen lung, costul mediu al achiziției e mai bun decât dacă ai încercat să ghicești 'momentul perfect'."
+      },
+      {
+        text: "De ce sunt comisioanele atât de importante pe termen lung?",
+        options: ["Nu sunt importante, sunt sume mici", "Comisioanele se recuperează prin randamente mai mari", "Un comision de 1%/an în plus înseamnă, pe 30 ani și 200 lei/lună, zeci de mii de lei în plus plătiți — bani care nu s-au mai compus în portofoliu.", "Contează doar comisionul de cumpărare, nu cel anual al ETF-ului"],
+        correct: 2,
+        explanation: "Efectul comisioanelor compuse pe termen lung e devastator. Un ETF cu TER de 0,07%/an vs unul cu 2%/an face o diferență enormă în 20-30 ani."
+      },
+      {
+        text: "Alex are un portofoliu 60% acțiuni / 40% obligațiuni. După un an bun la bursă, acțiunile sunt acum 75%. Ce face la rebalansare?",
+        options: ["Nu face nimic, mai multe acțiuni înseamnă mai mulți bani", "Vinde o parte din acțiuni și cumpără obligațiuni, pentru a reveni la 60/40 inițial", "Vinde totul și reîncepede la zero", "Cumpără și mai multe acțiuni, trendul e ascendent"],
+        correct: 1,
+        explanation: "Rebalansarea disciplinează portofoliul și te obligă implicit să 'cumperi ieftin și vinzi scump': vinzi din ce a crescut mult și cumperi din ce a rămas în urmă."
+      }
+    ],
+    bossQuestion: {
+      text: "Platforma A: 0 comision tranzacție + ETF cu TER 1,9%/an. Platforma B: 2 euro/tranzacție + ETF cu TER 0,07%/an. Alex investește 200 lei/lună, 20 de ani. Care e mai ieftină?",
+      options: ["Platforma A — zero comision la tranzacție!", "Platforma B — TER-ul mic face diferența uriașă pe termen lung", "Sunt identice pe termen lung", "Depinde de câte tranzacții face Alex"],
+      correct: 1,
+      explanation: "Platforma B. TER-ul anual de 1,9% vs 0,07% face o diferență de ~1,83%/an pe portofoliu. Pe 20 ani, Platforma A costă zeci de mii de lei mai mult."
+    }
+  },
+  {
+    id: 9,
+    title: "Independența Financiară",
+    world: "💰 Lumea: Comoara Supremă",
+    objective: "🎯 Pragurile financiare, regula 4%, venit pasiv, planul de retragere",
+    boss: { name: "Eu din Trecut", type: "past_self" },
+    unlock: { name: "COMOARA", desc: "Educația financiară completă. Alex e liber financiar.", color: "#f4a261" },
+    neaQuote: "Ti-am spus eu. Secretul nu e să fii deștept. E să începi. Azi.",
+    dialogs: [
+      { speaker: "Alex", text: "Am supraviețuit 8 niveluri. Am bătut bossuri. Știu P/E, DCA, RSI. Acum întrebarea reală: când sunt liber financiar?" },
+      { speaker: "Nea Emil", text: "Asta e întrebarea de 1 milion de lei, băiete. Literal. Hai să calculăm exact cât." },
+      { speaker: "FinBot", text: "Regula celor 4%: dacă ai un portofoliu de X lei, poți retrage 4% pe an fără să-l termini în 30 de ani. Portofoliu necesar = cheltuielile anuale împărțite la 0,04." },
+      { speaker: "Mia", text: "Concret: cheltuiești 3.000 lei pe lună? Ai nevoie de 900.000 lei investiți. Sună mult. Dar tu ai 19 ani. Asta e cel mai puternic avantaj din lume și nu te costă nimic." },
+      { speaker: "FinBot", text: "300 lei pe lună, 8% randament, de la 19 ani. La 65 ani: peste 1.500.000 lei. Independența financiară posibil la 45 ani dacă mărești suma. Calculează mai jos cu cifrele tale." }
+    ],
+    questions: [
+      {
+        text: "Alex are cheltuieli de 2.500 lei/lună. Cât portofoliu are nevoie pentru independența financiară (regula 4%)?",
+        options: ["250.000 lei", "500.000 lei", "750.000 lei", "1.000.000 lei"],
+        correct: 2,
+        explanation: "2.500 lei/lună = 30.000 lei/an. Portofoliu necesar = 30.000 / 0,04 = 750.000 lei. Sau echivalent: cheltuielile lunare × 300."
+      },
+      {
+        text: "Ce înseamnă 'venit pasiv'?",
+        options: ["Venitul dintr-un al doilea job part-time", "Bani care vin fără să muncești activ pentru ei: dividende, dobânzi, chirie, etc.", "Salariul primit de la stat", "Venitul din vânzarea de obiecte vechi"],
+        correct: 1,
+        explanation: "Venitul pasiv vine din active (portofoliu, imobiliare, drepturi de autor) care generează bani fără muncă activă continuă. Acesta este fundamentul independenței financiare."
+      },
+      {
+        text: "Alex (19 ani) și prietenul său Dan (35 ani) încep să investească 300 lei/lună în același moment. La 65 ani, cine are mai mult?",
+        options: ["Dan, pentru că are experiență financiară mai mare", "Au aceeași sumă, suma lunară e identică", "Depinde de care companie aleg", "Alex, pentru că a investit cu 16 ani mai devreme — avantajul timpului e decisiv"],
+        correct: 3,
+        explanation: "Cei 16 ani în plus ai lui Alex înseamnă sute de mii de lei diferență datorită dobânzii compuse. Timpul este cel mai important ingredient al oricărei investiții."
+      }
+    ],
+    bossQuestion: {
+      text: "'Eu din Trecut' spune: 'E prea complicat. E prea riscant. Ești prea tânăr. Începe mai târziu când ai mai mulți bani.' Care este cel mai bun moment să înceapă Alex?",
+      options: ["Când are mai mulți bani", "Când e mai în vârstă și mai experimentat", "Acum, cu orice sumă disponibilă, pentru că fiecare lună contează", "Când bursa e la minim"],
+      correct: 2,
+      explanation: "Cel mai bun moment a fost acum 10 ani. Al doilea cel mai bun moment este ACUM. Suma contează mai puțin decât consecvența și timpul."
+    }
+  }
+];
+
+// SVG characters
+const AVATARS = {
+  alex: `<circle cx="40" cy="32" r="18" fill="#f4a261"/>
+    <ellipse cx="40" cy="18" rx="16" ry="8" fill="#1a1a2e"/>
+    <circle cx="34" cy="30" r="2.5" fill="#1a1a2e"/><circle cx="46" cy="30" r="2.5" fill="#1a1a2e"/>
+    <path d="M 35 38 Q 40 43 45 38" stroke="#1a1a2e" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M 22 30 Q 22 18 40 18 Q 58 18 58 30" stroke="#e76f51" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <rect x="18" y="28" width="8" height="10" rx="4" fill="#e76f51"/>
+    <rect x="54" y="28" width="8" height="10" rx="4" fill="#e76f51"/>
+    <rect x="24" y="50" width="32" height="24" rx="6" fill="#16213e"/>
+    <text x="40" y="65" text-anchor="middle" font-size="6" fill="#f4a261" font-family="Cinzel,serif" font-weight="700">GAMER</text>`,
+
+  nea_emil: `<circle cx="40" cy="34" r="20" fill="#d4956a"/>
+    <rect x="20" y="14" width="40" height="12" rx="6" fill="#4a3728"/>
+    <circle cx="33" cy="32" r="2.5" fill="#3d2b1f"/><circle cx="47" cy="32" r="2.5" fill="#3d2b1f"/>
+    <path d="M 30 28 Q 33 24 36 28" stroke="#8b6914" stroke-width="1.5" fill="#c8a951"/>
+    <path d="M 44 28 Q 47 24 50 28" stroke="#8b6914" stroke-width="1.5" fill="#c8a951"/>
+    <path d="M 31 42 Q 40 48 49 42" stroke="#8b5e3c" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M 28 40 Q 30 44 40 46 Q 50 44 52 40" fill="#c8a951"/>
+    <rect x="22" y="54" width="36" height="22" rx="6" fill="#2d4a3e"/>`,
+
+  mia: `<circle cx="40" cy="33" r="19" fill="#f9c8a0"/>
+    <ellipse cx="40" cy="17" rx="17" ry="9" fill="#2c1810"/>
+    <rect x="23" y="14" width="34" height="10" rx="5" fill="#2c1810"/>
+    <circle cx="33" cy="31" r="2.5" fill="#2c1810"/><circle cx="47" cy="31" r="2.5" fill="#2c1810"/>
+    <rect x="29" y="28" width="9" height="7" rx="1" fill="none" stroke="#5b8dd9" stroke-width="1.5"/>
+    <rect x="42" y="28" width="9" height="7" rx="1" fill="none" stroke="#5b8dd9" stroke-width="1.5"/>
+    <line x1="38" y1="31.5" x2="42" y2="31.5" stroke="#5b8dd9" stroke-width="1.5"/>
+    <path d="M 33 40 Q 40 46 47 40" stroke="#2c1810" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <rect x="23" y="52" width="34" height="24" rx="6" fill="#5b8dd9"/>
+    <rect x="30" y="58" width="20" height="14" rx="2" fill="white" opacity="0.3"/>`,
+
+  finbot: `<rect x="18" y="20" width="44" height="38" rx="8" fill="#1a3a5c"/>
+    <rect x="22" y="24" width="36" height="24" rx="4" fill="#0a1628"/>
+    <line x1="26" y1="36" x2="26" y2="44" stroke="#2ec4b6" stroke-width="2"/>
+    <line x1="30" y1="32" x2="30" y2="44" stroke="#2ec4b6" stroke-width="2"/>
+    <line x1="34" y1="38" x2="34" y2="44" stroke="#f4a261" stroke-width="2"/>
+    <line x1="38" y1="30" x2="38" y2="44" stroke="#2ec4b6" stroke-width="2"/>
+    <line x1="42" y1="34" x2="42" y2="44" stroke="#f4a261" stroke-width="2"/>
+    <line x1="46" y1="28" x2="46" y2="44" stroke="#2ec4b6" stroke-width="2"/>
+    <rect x="28" y="62" width="24" height="8" rx="4" fill="#1a3a5c"/>
+    <circle cx="34" cy="66" r="2" fill="#2ec4b6"/>
+    <circle cx="40" cy="66" r="2" fill="#f4a261"/>
+    <circle cx="46" cy="66" r="2" fill="#2ec4b6"/>
+    <circle cx="30" cy="14" r="5" fill="#1a3a5c"/>
+    <circle cx="50" cy="14" r="5" fill="#1a3a5c"/>
+    <rect x="30" y="14" width="20" height="6" fill="#1a3a5c"/>`,
+
+  boss_temptation: `<ellipse cx="60" cy="55" rx="38" ry="32" fill="#8b1a1a"/>
+    <polygon points="60,15 75,35 45,35" fill="#c0392b"/>
+    <polygon points="30,30 20,55 40,48" fill="#c0392b"/>
+    <polygon points="90,30 100,55 80,48" fill="#c0392b"/>
+    <circle cx="49" cy="50" r="5" fill="#ff6b35"/>
+    <circle cx="71" cy="50" r="5" fill="#ff6b35"/>
+    <path d="M 45 65 Q 60 75 75 65" stroke="#ff6b35" stroke-width="3" fill="none"/>
+    <circle cx="60" cy="40" r="10" fill="#f4a261" opacity="0.8"/>
+    <text x="60" y="44" text-anchor="middle" font-size="9" fill="#8b1a1a" font-weight="900">2000</text>
+    <text x="60" y="50" text-anchor="middle" font-size="5" fill="#8b1a1a">LEI</text>`,
+
+  boss_inflation: `<circle cx="60" cy="55" r="38" fill="#7b3f00"/>
+    <path d="M 35 30 Q 60 15 85 30 Q 95 55 85 80 Q 60 95 35 80 Q 25 55 35 30" fill="#9b5000"/>
+    <circle cx="48" cy="48" r="6" fill="#ff8c00"/>
+    <circle cx="72" cy="48" r="6" fill="#ff8c00"/>
+    <path d="M 42 68 Q 60 78 78 68" stroke="#ff8c00" stroke-width="3" fill="none"/>
+    <text x="60" y="42" text-anchor="middle" font-size="12" fill="#ff8c00" font-weight="900">%</text>
+    <text x="60" y="92" text-anchor="middle" font-size="8" fill="#ffd700" font-weight="700">INFLAȚIE</text>`,
+
+  boss_fomo: `<polygon points="60,15 90,70 30,70" fill="#6b0080"/>
+    <polygon points="60,20 85,65 35,65" fill="#8b00a0"/>
+    <circle cx="50" cy="50" r="4" fill="#ff00ff"/>
+    <circle cx="70" cy="50" r="4" fill="#ff00ff"/>
+    <path d="M 44 60 Q 60 70 76 60" stroke="#ff00ff" stroke-width="2.5" fill="none"/>
+    <text x="60" y="38" text-anchor="middle" font-size="8" fill="#ffd700" font-weight="900">FOMO</text>
+    <circle cx="60" cy="80" r="12" fill="#6b0080"/>
+    <text x="60" y="84" text-anchor="middle" font-size="9" fill="#ff00ff" font-weight="900">📈</text>`,
+
+  boss_generic: `<rect x="25" y="25" width="70" height="70" rx="10" fill="#1a0a2e"/>
+    <rect x="30" y="30" width="60" height="60" rx="8" fill="#2d1456"/>
+    <circle cx="48" cy="52" r="6" fill="#e63946"/>
+    <circle cx="72" cy="52" r="6" fill="#e63946"/>
+    <path d="M 43 68 Q 60 78 77 68" stroke="#e63946" stroke-width="3" fill="none"/>
+    <polygon points="60,20 65,32 60,30 55,32" fill="#e63946"/>`,
+
+  dragon_small: `<ellipse cx="50" cy="65" rx="20" ry="15" fill="#1a8a4a"/>
+    <polygon points="50,35 62,58 38,58" fill="#1a8a4a"/>
+    <circle cx="44" cy="52" r="3" fill="#ffd700"/>
+    <circle cx="56" cy="52" r="3" fill="#ffd700"/>
+    <polygon points="38,40 30,50 38,55" fill="#2ec4b6"/>
+    <polygon points="62,40 70,50 62,55" fill="#2ec4b6"/>
+    <ellipse cx="50" cy="78" rx="8" ry="5" fill="#0f6e38"/>`,
+
+  dragon_medium: `<ellipse cx="50" cy="62" rx="28" ry="20" fill="#1a8a4a"/>
+    <polygon points="50,20 68,52 32,52" fill="#1a8a4a"/>
+    <circle cx="40" cy="45" r="4" fill="#ffd700"/>
+    <circle cx="60" cy="45" r="4" fill="#ffd700"/>
+    <polygon points="28,30 14,52 28,58" fill="#2ec4b6"/>
+    <polygon points="72,30 86,52 72,58" fill="#2ec4b6"/>
+    <ellipse cx="50" cy="80" rx="12" ry="7" fill="#0f6e38"/>
+    <path d="M 44 60 L 38 75 L 50 70 L 62 75 L 56 60" fill="#ffd700" opacity="0.7"/>`,
+
+  dragon_large: `<ellipse cx="50" cy="58" rx="36" ry="26" fill="#1a8a4a"/>
+    <polygon points="50,10 72,46 28,46" fill="#228b3a"/>
+    <circle cx="37" cy="38" r="5.5" fill="#ffd700"/>
+    <circle cx="63" cy="38" r="5.5" fill="#ffd700"/>
+    <circle cx="38" cy="37" r="2" fill="#1a0000"/>
+    <circle cx="64" cy="37" r="2" fill="#1a0000"/>
+    <polygon points="22,22 4,48 22,54" fill="#2ec4b6"/>
+    <polygon points="78,22 96,48 78,54" fill="#2ec4b6"/>
+    <ellipse cx="50" cy="82" rx="16" ry="9" fill="#0f6e38"/>
+    <path d="M 36 58 L 26 78 L 50 70 L 74 78 L 64 58" fill="#ffd700" opacity="0.8"/>
+    <path d="M 40 30 Q 50 22 60 30" stroke="#ffd700" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <polygon points="40,18 45,28 35,28" fill="#ffd700" opacity="0.9"/>
+    <polygon points="60,18 65,28 55,28" fill="#ffd700" opacity="0.9"/>`
+};
+
+// ===== GAME STATE =====
+let state = {
+  currentLevel: 0,
+  currentDialog: 0,
+  currentQuestion: 0,
+  lives: 3,
+  score: 0,
+  unlockedAllies: [],
+  dragonSize: 0,
+  phase: 'start',
+  bossTimer: null,
+  bossTimeLeft: 30,
+  bossAnswered: false
+};
+
+// ===== INIT =====
+function initStartDots() {
+  const container = document.getElementById('start-dots');
+  container.innerHTML = '';
+  for (let i = 1; i <= 9; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'level-dot';
+    dot.textContent = i;
+    container.appendChild(dot);
+  }
+}
+
+function startGame() {
+  state.currentLevel = 0;
+  state.score = 0;
+  state.unlockedAllies = [];
+  state.dragonSize = 0;
+  showLevel(0);
+}
+
+function showLevel(idx) {
+  state.currentLevel = idx;
+  state.currentDialog = 0;
+  state.currentQuestion = 0;
+  state.lives = 3;
+  state.phase = 'dialog';
+  state.bossAnswered = false;
+
+  const level = LEVELS[idx];
+  updateProgress(idx);
+
+  document.getElementById('dialog-level-label').textContent = `NIVELUL ${level.id}`;
+  document.getElementById('dialog-level-title').textContent = level.title;
+  document.getElementById('dialog-level-world').textContent = level.world;
+  document.getElementById('dialog-level-objective').textContent = level.objective;
+
+  showScreen('dialog');
+  renderDialog();
+}
+
+function renderDialog() {
+  const level = LEVELS[state.currentLevel];
+  const dialogs = level.dialogs;
+  const d = dialogs[state.currentDialog];
+
+  document.getElementById('dialog-name').textContent = d.speaker;
+  document.getElementById('dialog-counter').textContent = `${state.currentDialog + 1} / ${dialogs.length}`;
+
+  const isLast = state.currentDialog === dialogs.length - 1;
+  document.getElementById('btn-continue').textContent = isLast ? 'Spre întrebări →' : 'Continuă →';
+
+  // Set avatar
+  const avatarEl = document.getElementById('dialog-avatar');
+  const avatarKey = d.speaker === 'Alex' ? 'alex'
+    : d.speaker === 'Nea Emil' ? 'nea_emil'
+    : d.speaker === 'Mia' ? 'mia'
+    : d.speaker === 'FinBot' ? 'finbot'
+    : 'alex';
+
+  avatarEl.innerHTML = AVATARS[avatarKey] || AVATARS.alex;
+
+  // Typewriter effect
+  typewriter(document.getElementById('dialog-text'), d.text, 22);
+}
+
+function typewriter(el, text, speed) {
+  el.textContent = '';
+  let i = 0;
+  const btn = document.getElementById('btn-continue');
+  btn.disabled = true;
+  const interval = setInterval(() => {
+    el.textContent += text[i];
+    i++;
+    if (i >= text.length) {
+      clearInterval(interval);
+      btn.disabled = false;
+    }
+  }, speed);
+  el.dataset.fullText = text;
+  el.addEventListener('click', () => {
+    clearInterval(interval);
+    el.textContent = text;
+    btn.disabled = false;
+  }, { once: true });
+}
+
+function advanceDialog() {
+  const level = LEVELS[state.currentLevel];
+  if (state.currentDialog < level.dialogs.length - 1) {
+    state.currentDialog++;
+    renderDialog();
+  } else {
+    startQuestions();
+  }
+}
+
+// ===== QUESTIONS =====
+function startQuestions() {
+  state.currentQuestion = 0;
+  state.phase = 'questions';
+  showScreen('question');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const level = LEVELS[state.currentLevel];
+  const q = level.questions[state.currentQuestion];
+
+  updateProgress(state.currentLevel);
+  renderLives();
+  document.getElementById('q-counter').textContent = `Întrebarea ${state.currentQuestion + 1}/${level.questions.length}`;
+  document.getElementById('score-display').textContent = `⭐ ${state.score}`;
+  document.getElementById('q-number').textContent = `ÎNTREBAREA ${state.currentQuestion + 1}`;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('explanation-box').className = 'explanation-box';
+  document.getElementById('explanation-box').textContent = '';
+  document.getElementById('btn-next-q').style.display = 'none';
+  document.getElementById('btn-prev-q').style.visibility = (state.currentQuestion === 0 && state.currentLevel === 0) ? 'hidden' : 'visible';
+
+  const grid = document.getElementById('answers-grid');
+  grid.innerHTML = '';
+  const labels = ['A', 'B', 'C', 'D'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.innerHTML = `<span class="opt-label">${labels[i]}</span>${opt}`;
+    btn.onclick = () => answerQuestion(i, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function answerQuestion(idx, btn) {
+  const level = LEVELS[state.currentLevel];
+  const q = level.questions[state.currentQuestion];
+  const allBtns = document.querySelectorAll('#answers-grid .answer-btn');
+
+  allBtns.forEach(b => b.disabled = true);
+
+  const expBox = document.getElementById('explanation-box');
+  expBox.textContent = q.explanation;
+
+  if (idx === q.correct) {
+    btn.classList.add('correct');
+    expBox.className = 'explanation-box show';
+    state.score += 10;
+    document.getElementById('score-display').textContent = `⭐ ${state.score}`;
+  } else {
+    btn.classList.add('wrong');
+    allBtns[q.correct].classList.add('reveal-correct');
+    expBox.className = 'explanation-box show wrong-exp';
+    loseLife();
+  }
+
+  document.getElementById('btn-next-q').style.display = 'block';
+}
+
+function nextQuestion() {
+  const level = LEVELS[state.currentLevel];
+  if (state.currentQuestion < level.questions.length - 1) {
+    state.currentQuestion++;
+    renderQuestion();
+  } else {
+    startBoss();
+  }
+}
+
+function prevQuestion() {
+  if (state.currentQuestion > 0) {
+    state.currentQuestion--;
+    renderQuestion();
+  } else {
+    // Prima întrebare — ne întoarcem la dialog
+    state.currentDialog = LEVELS[state.currentLevel].dialogs.length - 1;
+    state.phase = 'dialog';
+    showScreen('dialog');
+    renderDialog();
+  }
+}
+
+function loseLife() {
+  state.lives--;
+  renderLives();
+  if (state.lives <= 0) {
+    setTimeout(() => {
+      document.getElementById('gameover-score').textContent = `⭐ ${state.score} puncte`;
+      showScreen('gameover');
+    }, 1200);
+  }
+}
+
+function renderLives() {
+  const bar = document.getElementById('lives-bar');
+  bar.innerHTML = '';
+  for (let i = 0; i < 3; i++) {
+    const icon = document.createElement('span');
+    icon.className = 'life-icon' + (i >= state.lives ? ' lost' : '');
+    icon.textContent = '❤️';
+    bar.appendChild(icon);
+  }
+}
+
+function retryLevel() {
+  showLevel(state.currentLevel);
+}
+
+// ===== BOSS =====
+function startBoss() {
+  state.phase = 'boss';
+  state.bossAnswered = false;
+  state.bossTimeLeft = 30;
+
+  const level = LEVELS[state.currentLevel];
+  const boss = level.bossQuestion;
+
+  document.getElementById('boss-name').textContent = level.boss.name;
+  document.getElementById('boss-q-text').textContent = boss.text;
+  document.getElementById('boss-explanation-box').className = 'explanation-box';
+  document.getElementById('boss-explanation-box').textContent = '';
+
+  // Boss avatar
+  const bossType = level.boss.type;
+  const bossAvatarKey = bossType === 'temptation' ? 'boss_temptation'
+    : bossType === 'inflation' ? 'boss_inflation'
+    : bossType === 'fomo' ? 'boss_fomo'
+    : 'boss_generic';
+
+  document.getElementById('boss-avatar').innerHTML = AVATARS[bossAvatarKey] || AVATARS.boss_generic;
+
+  // Answers
+  const grid = document.getElementById('boss-answers-grid');
+  grid.innerHTML = '';
+  const labels = ['A', 'B', 'C', 'D'];
+  boss.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.innerHTML = `<span class="opt-label">${labels[i]}</span>${opt}`;
+    btn.onclick = () => answerBoss(i, btn);
+    grid.appendChild(btn);
+  });
+
+  showScreen('boss');
+  startBossTimer();
+}
+
+function startBossTimer() {
+  const bar = document.getElementById('timer-bar');
+  const display = document.getElementById('timer-display');
+  state.bossTimeLeft = 30;
+
+  if (state.bossTimer) clearInterval(state.bossTimer);
+
+  state.bossTimer = setInterval(() => {
+    state.bossTimeLeft--;
+    display.textContent = state.bossTimeLeft;
+    bar.style.width = (state.bossTimeLeft / 30 * 100) + '%';
+
+    if (state.bossTimeLeft <= 0) {
+      clearInterval(state.bossTimer);
+      if (!state.bossAnswered) {
+        timeoutBoss();
+      }
+    }
+  }, 1000);
+}
+
+function timeoutBoss() {
+  state.bossAnswered = true;
+  const allBtns = document.querySelectorAll('#boss-answers-grid .answer-btn');
+  allBtns.forEach(b => b.disabled = true);
+  const level = LEVELS[state.currentLevel];
+  allBtns[level.bossQuestion.correct].classList.add('reveal-correct');
+  const expBox = document.getElementById('boss-explanation-box');
+  expBox.textContent = '⏱️ Timp expirat! ' + level.bossQuestion.explanation;
+  expBox.className = 'explanation-box show wrong-exp';
+  loseLife();
+  setTimeout(() => {
+    if (state.lives > 0) showReward();
+  }, 2000);
+}
+
+function answerBoss(idx, btn) {
+  if (state.bossAnswered) return;
+  state.bossAnswered = true;
+  clearInterval(state.bossTimer);
+
+  const level = LEVELS[state.currentLevel];
+  const boss = level.bossQuestion;
+  const allBtns = document.querySelectorAll('#boss-answers-grid .answer-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  const expBox = document.getElementById('boss-explanation-box');
+  expBox.textContent = boss.explanation;
+
+  if (idx === boss.correct) {
+    btn.classList.add('correct');
+    expBox.className = 'explanation-box show';
+    state.score += 20;
+    setTimeout(() => showReward(), 1800);
+  } else {
+    btn.classList.add('wrong');
+    allBtns[boss.correct].classList.add('reveal-correct');
+    expBox.className = 'explanation-box show wrong-exp';
+    loseLife();
+    if (state.lives > 0) setTimeout(() => showReward(), 2000);
+  }
+}
+
+// ===== REWARD =====
+function showReward() {
+  const level = LEVELS[state.currentLevel];
+  state.dragonSize = state.currentLevel + 1;
+
+  if (!state.unlockedAllies.includes(level.unlock.name)) {
+    state.unlockedAllies.push(level.unlock.name);
+  }
+
+  document.getElementById('reward-subtitle').textContent = `Ai trecut de Nivelul ${level.id}: ${level.title}`;
+  document.getElementById('unlock-name').textContent = level.unlock.name;
+  document.getElementById('unlock-desc').textContent = level.unlock.desc;
+  document.getElementById('nea-quote-reward').textContent = `"${level.neaQuote}"`;
+
+  const isLast = state.currentLevel === LEVELS.length - 1;
+  document.getElementById('btn-next-level').textContent = isLast ? '🏆 Comoara finală!' : 'Nivelul următor →';
+
+  // Dragon
+  const dragonSvg = document.getElementById('dragon-reward');
+  const dragonLabels = ['Pui de dragon', 'Dragon mic', 'Dragon în creștere', 'Dragon matur', 'Dragon puternic', 'Dragon înțelept', 'Dragon champion', 'Dragon legendar', 'Dragon suprem'];
+  const dragonKey = state.dragonSize <= 3 ? 'dragon_small' : state.dragonSize <= 6 ? 'dragon_medium' : 'dragon_large';
+  dragonSvg.innerHTML = AVATARS[dragonKey];
+  const scale = 0.6 + state.dragonSize * 0.07;
+  dragonSvg.style.transform = `scale(${scale})`;
+  dragonSvg.setAttribute('width', '100');
+  dragonSvg.setAttribute('height', '100');
+  document.getElementById('dragon-level-text').textContent = `Nivel ${state.dragonSize} — ${dragonLabels[state.dragonSize - 1] || 'Dragon suprem'}`;
+
+  showScreen('reward');
+  launchConfetti();
+}
+
+function nextLevel() {
+  if (state.currentLevel < LEVELS.length - 1) {
+    showLevel(state.currentLevel + 1);
+  } else {
+    showFinalScreen();
+  }
+}
+
+// ===== FINAL SCREEN =====
+function showFinalScreen() {
+  // Dragon final
+  const dragonFinal = document.getElementById('dragon-final');
+  dragonFinal.innerHTML = AVATARS.dragon_large;
+
+  // Allies
+  const alliesRow = document.getElementById('final-allies');
+  const alliesDef = [
+    { name: 'Nea Emil', avatar: 'nea_emil' },
+    { name: 'Compus', avatar: 'dragon_small' },
+    { name: 'Mia', avatar: 'mia' },
+    { name: 'FinBot', avatar: 'finbot' }
+  ];
+  alliesRow.innerHTML = '';
+  alliesDef.forEach(a => {
+    const card = document.createElement('div');
+    card.className = 'ally-card';
+    card.innerHTML = `<svg viewBox="0 0 80 80" width="60" height="60">${AVATARS[a.avatar] || ''}</svg><div class="ally-name">${a.name}</div>`;
+    alliesRow.appendChild(card);
+  });
+
+  showScreen('final');
+  updateCalc();
+  launchConfetti();
+}
+
+function updateCalc() {
+  const age = parseFloat(document.getElementById('calc-age').value) || 25;
+  const monthly = parseFloat(document.getElementById('calc-monthly').value) || 300;
+  const expenses = parseFloat(document.getElementById('calc-expenses').value) || 3000;
+  const annualRate = parseFloat(document.getElementById('calc-rate').value) || 8;
+  const monthlyRate = annualRate / 100 / 12;
+  const retireAge = 65;
+  const months = Math.max(0, (retireAge - age) * 12);
+
+  // Portofoliu necesar (regula 4%)
+  const fiTarget = expenses * 12 / 0.04;
+  const fiTargetFormatted = Math.round(fiTarget).toLocaleString('ro-RO');
+  document.getElementById('calc-target-value').textContent = fiTargetFormatted + ' lei';
+
+  // Valoare portofoliu la 65 ani
+  const fv = monthlyRate > 0
+    ? monthly * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate)
+    : monthly * months;
+  const fvFormatted = Math.round(fv).toLocaleString('ro-RO');
+  document.getElementById('calc-result-value').textContent = fvFormatted + ' lei';
+  document.getElementById('finbot-projection').textContent = fvFormatted;
+  document.getElementById('calc-result-label').textContent = `la ${retireAge} ani (${Math.max(0, retireAge - age)} ani de investit)`;
+
+  // Când atinge independența financiară
+  let fiMonths = 0;
+  let acc = 0;
+  const maxMonths = 600;
+  while (acc < fiTarget && fiMonths < maxMonths) {
+    acc = acc * (1 + monthlyRate) + monthly;
+    fiMonths++;
+  }
+
+  const fiBox = document.getElementById('calc-fi-box');
+  const fiAgeEl = document.getElementById('calc-fi-age');
+  const fiDetailEl = document.getElementById('calc-fi-detail');
+
+  if (fiMonths >= maxMonths) {
+    fiBox.style.background = 'rgba(230,57,70,0.1)';
+    fiAgeEl.style.color = '#e63946';
+    fiAgeEl.textContent = '⚠️ Nu atingi ținta în 50 ani';
+    fiDetailEl.textContent = `Mărește suma lunară sau ajustează cheltuielile dorite`;
+  } else {
+    const fiAge = Math.round(age + fiMonths / 12);
+    const fiYears = Math.round(fiMonths / 12);
+    fiBox.style.background = 'rgba(46,196,182,0.1)';
+    fiAgeEl.style.color = 'var(--teal)';
+    fiAgeEl.textContent = `🎯 Independență financiară la ~${fiAge} ani`;
+    fiDetailEl.textContent = `după ${fiYears} ani de investit • portofoliu: ${fiTargetFormatted} lei`;
+  }
+}
+
+// ===== UTILITIES =====
+function updateProgress(levelIdx) {
+  const pct = (levelIdx / LEVELS.length) * 100;
+  document.getElementById('global-progress-bar').style.width = pct + '%';
+  document.getElementById('q-progress-bar').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `Nivelul ${levelIdx + 1}/9`;
+  document.getElementById('q-progress-label').textContent = `Nivelul ${levelIdx + 1}/9`;
+}
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+}
+
+function launchConfetti() {
+  const colors = ['#f4a261', '#2ec4b6', '#e63946', '#ffd700', '#9b59b6', '#3498db'];
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random() * 100 + 'vw';
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+      piece.style.animationDelay = Math.random() * 0.5 + 's';
+      piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      document.body.appendChild(piece);
+      setTimeout(() => piece.remove(), 4000);
+    }, i * 30);
+  }
+}
+
+// ===== START =====
+initStartDots();
+</script>
+</body>
+</html>
