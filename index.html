@@ -764,6 +764,43 @@
   }
 
   .btn-retry:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(230,57,70,0.5); }
+
+  /* ===== ANIMAȚII PERSONAJE ===== */
+  @keyframes dialogEnter {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .dialog-animate {
+    animation: dialogEnter 0.35s ease forwards;
+  }
+
+  @keyframes avatarBounce {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(46,196,182,0); }
+    30% { transform: scale(1.18); box-shadow: 0 0 0 6px rgba(46,196,182,0.4); }
+    60% { transform: scale(0.93); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(46,196,182,0); }
+  }
+
+  @keyframes avatarShake {
+    0%, 100% { transform: translateX(0); box-shadow: 0 0 0 0 rgba(230,57,70,0); }
+    15% { transform: translateX(-8px); box-shadow: 0 0 0 4px rgba(230,57,70,0.5); }
+    35% { transform: translateX(8px); }
+    55% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+
+  .avatar-bounce { animation: avatarBounce 0.55s ease forwards; }
+  .avatar-shake  { animation: avatarShake  0.55s ease forwards; }
+
+  .question-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(244,162,97,0.4);
+    flex-shrink: 0;
+  }
 </style>
 </head>
 <body>
@@ -813,7 +850,8 @@
       <div class="progress-label" id="q-progress-label">Nivelul 1/9</div>
       <div class="progress-bar-wrap"><div class="progress-bar" id="q-progress-bar" style="width:0%"></div></div>
     </div>
-    <div style="display:flex; justify-content:space-between; align-items:center;">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+      <img id="question-avatar" class="question-avatar" src="" alt="" />
       <div class="lives-bar" id="lives-bar"></div>
       <div class="question-progress" id="q-counter">Întrebarea 1/5</div>
       <div class="score-display" id="score-display">⭐ 0</div>
@@ -1523,6 +1561,12 @@ function renderDialog() {
   const dialogs = level.dialogs;
   const d = dialogs[state.currentDialog];
 
+  // Replay animație dialog la fiecare schimbare
+  const panel = document.getElementById('dialog-panel');
+  panel.classList.remove('dialog-animate');
+  void panel.offsetWidth;
+  panel.classList.add('dialog-animate');
+
   document.getElementById('dialog-name').textContent = d.speaker;
   document.getElementById('dialog-counter').textContent = `${state.currentDialog + 1} / ${dialogs.length}`;
 
@@ -1546,6 +1590,7 @@ function renderDialog() {
   const imgSrc = CHAR_IMGS[avatarKey] || CHAR_IMGS.alex;
   avatarEl.style.cssText = 'width:80px;height:80px;border-radius:50%;background:var(--card2);border:2px solid rgba(244,162,97,0.4);overflow:hidden;flex-shrink:0;padding:0;';
   avatarEl.innerHTML = '<img src="' + imgSrc + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;animation:charBounce 0.4s ease;" />';
+  state.currentAvatarSrc = imgSrc;
 
   // Typewriter effect
   typewriter(document.getElementById('dialog-text'), d.text, 22);
@@ -1603,6 +1648,9 @@ function renderQuestion() {
   document.getElementById('explanation-box').className = 'explanation-box';
   document.getElementById('explanation-box').textContent = '';
   document.getElementById('btn-next-q').style.display = 'none';
+
+  const qAvatar = document.getElementById('question-avatar');
+  if (state.currentAvatarSrc) qAvatar.src = state.currentAvatarSrc;
   document.getElementById('btn-prev-q').style.visibility = (state.currentQuestion === 0 && state.currentLevel === 0) ? 'hidden' : 'visible';
 
   const grid = document.getElementById('answers-grid');
@@ -1627,16 +1675,24 @@ function answerQuestion(idx, btn) {
   const expBox = document.getElementById('explanation-box');
   expBox.textContent = q.explanation;
 
+  const qAvatar = document.getElementById('question-avatar');
+
   if (idx === q.correct) {
     btn.classList.add('correct');
     expBox.className = 'explanation-box show';
     state.score += 10;
     document.getElementById('score-display').textContent = `⭐ ${state.score}`;
+    qAvatar.classList.remove('avatar-shake');
+    qAvatar.classList.add('avatar-bounce');
+    setTimeout(() => qAvatar.classList.remove('avatar-bounce'), 600);
   } else {
     btn.classList.add('wrong');
     allBtns[q.correct].classList.add('reveal-correct');
     expBox.className = 'explanation-box show wrong-exp';
     loseLife();
+    qAvatar.classList.remove('avatar-bounce');
+    qAvatar.classList.add('avatar-shake');
+    setTimeout(() => qAvatar.classList.remove('avatar-shake'), 600);
   }
 
   document.getElementById('btn-next-q').style.display = 'block';
